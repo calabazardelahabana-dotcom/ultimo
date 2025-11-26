@@ -1,0 +1,100 @@
+[21-Nov-2025 19:00:17 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_negocios'@'localhost' (using password: YES)
+[21-Nov-2025 19:00:26 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_negocios'@'localhost' (using password: YES)
+[21-Nov-2025 20:29:13 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:29:13 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/install.php(4): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:29:40 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:29:40 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/install.php(4): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:29:59 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:29:59 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:06 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:06 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:28 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:28 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:32:44 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:32:44 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:33:47 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:33:47 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/install.php(4): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:42:14 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:42:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/install.php(4): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:42:50 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:42:50 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:57:34 UTC] PHP Warning:  require_once(/home/massolag/negocios.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:57:34 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/negocios.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/negocios.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/negocios.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:58:42 UTC] PHP Warning:  require_once(/home/massolag/negocios.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:58:42 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/negocios.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/negocios.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/negocios.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:59:06 UTC] PHP Warning:  require_once(/home/massolag/negocios.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:59:06 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/negocios.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/negocios.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/negocios.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:59:58 UTC] PHP Warning:  require_once(/home/massolag/negocios.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:59:58 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/negocios.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/negocios.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/negocios.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 21:00:42 UTC] PHP Warning:  require_once(/home/massolag/negocios.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 21:00:42 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/negocios.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/negocios.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/negocios.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 21:00:56 UTC] PHP Warning:  require_once(/home/massolag/negocios.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 21:00:56 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/negocios.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/negocios.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/negocios.massolagroup.com/public/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/negocios.massolagroup.com/includes/init.php on line 9
+[26-Nov-2025 22:48:47 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:48:47 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:48:47 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:48:47 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:49:25 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:49:25 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:49:25 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)
+[26-Nov-2025 22:49:26 UTC] DB connect error: SQLSTATE[28000] [1045] Access denied for user 'massolag_commerce_nat'@'localhost' (using password: YES)

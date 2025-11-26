@@ -1,0 +1,16 @@
+[21-Nov-2025 20:19:34 UTC] PHP Fatal error:  Uncaught Error: Call to a member function fetchColumn() on true in /home/massolag/tiempo.massolagroup.com/public/dashboard/index.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/public/dashboard/index.php on line 24
+[21-Nov-2025 20:30:14 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/dashboard/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:16 UTC] PHP Warning:  require_once(/home/massolag/tiempo.massolagroup.com/includes/cache.php): Failed to open stream: No such file or directory in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
+[21-Nov-2025 20:30:16 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/massolag/tiempo.massolagroup.com/includes/cache.php' (include_path='.:/opt/alt/php84/usr/share/pear:/opt/alt/php84/usr/share/php:/usr/share/pear:/usr/share/php') in /home/massolag/tiempo.massolagroup.com/includes/init.php:9
+Stack trace:
+#0 /home/massolag/tiempo.massolagroup.com/public/dashboard/index.php(3): require_once()
+#1 {main}
+  thrown in /home/massolag/tiempo.massolagroup.com/includes/init.php on line 9
