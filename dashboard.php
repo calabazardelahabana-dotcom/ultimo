@@ -1,152 +1,228 @@
 <?php
-// dashboard.php - Dashboard principal en raíz
+// dashboard.php - Panel principal
 require_once __DIR__ . '/includes/init.php';
 require_login();
 
 $user = current_user($pdo);
-$tenant = null;
+$pageTitle = 'Dashboard - MassolaCommerce';
 
-if (!empty($user['tenant_id'])) {
-    $stmt = $pdo->prepare("SELECT * FROM tenants WHERE id = :id AND deleted_at IS NULL LIMIT 1");
-    $stmt->execute([':id' => $user['tenant_id']]);
-    $tenant = $stmt->fetch();
+// Obtener estadísticas básicas
+$stats = [
+    'products' => 0,
+    'orders' => 0,
+    'revenue' => 0,
+    'tenants' => 0
+];
+
+if (is_superadmin()) {
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM tenants WHERE deleted_at IS NULL");
+    $stats['tenants'] = $stmt->fetch()['total'];
 }
 
-$pageTitle = 'Dashboard - MassolaCommerce';
+// Obtener tenant del usuario
+$tenantStmt = $pdo->prepare("SELECT t.* FROM tenants t JOIN users u ON u.tenant_id = t.id WHERE u.id = :uid LIMIT 1");
+$tenantStmt->execute([':uid' => $_SESSION['user_id']]);
+$tenant = $tenantStmt->fetch();
+
+if ($tenant) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM products WHERE tenant_id = :tid AND deleted_at IS NULL");
+    $stmt->execute([':tid' => $tenant['id']]);
+    $stats['products'] = $stmt->fetch()['total'];
+    
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE tenant_id = :tid");
+    $stmt->execute([':tid' => $tenant['id']]);
+    $stats['orders'] = $stmt->fetch()['total'];
+    
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(total_amount), 0) as total FROM orders WHERE tenant_id = :tid AND status = 'completed'");
+    $stmt->execute([':tid' => $tenant['id']]);
+    $stats['revenue'] = $stmt->fetch()['total'];
+}
 
 include_once __DIR__ . '/header.php';
 ?>
 
-<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 20px;">
-    
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-        <h1 style="margin: 0 0 10px 0; font-size: 32px;">
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-        </h1>
-        <p style="margin: 0; opacity: 0.9; font-size: 18px;">
-            Bienvenido, <strong><?= sanitize($user['username'] ?? $user['email']) ?></strong>
-        </p>
-        <?php if ($tenant): ?>
-            <p style="margin: 10px 0 0 0; opacity: 0.8;">
-                <i class="fas fa-store"></i> Administrando: <?= sanitize($tenant['name']) ?>
-            </p>
-        <?php endif; ?>
-    </div>
-    
-    <?php if ($tenant): ?>
-        
-        <!-- Menu de navegación del dashboard -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
-            
-            <a href="/products.php" style="background: white; padding: 30px; border-radius: 12px; text-decoration: none; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid #667eea;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                        <i class="fas fa-box" style="font-size: 24px; color: white;"></i>
-                    </div>
-                    <h3 style="margin: 0; font-size: 20px;">Productos</h3>
-                </div>
-                <p style="margin: 0; color: #666; font-size: 14px;">Gestiona tu inventario y catálogo de productos</p>
-            </a>
-            
-            <a href="/orders.php" style="background: white; padding: 30px; border-radius: 12px; text-decoration: none; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid #28a745;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                        <i class="fas fa-shopping-cart" style="font-size: 24px; color: white;"></i>
-                    </div>
-                    <h3 style="margin: 0; font-size: 20px;">Pedidos</h3>
-                </div>
-                <p style="margin: 0; color: #666; font-size: 14px;">Administra y procesa tus pedidos</p>
-            </a>
-            
-            <a href="/settings.php" style="background: white; padding: 30px; border-radius: 12px; text-decoration: none; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid #ffc107;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                        <i class="fas fa-cog" style="font-size: 24px; color: white;"></i>
-                    </div>
-                    <h3 style="margin: 0; font-size: 20px;">Configuración</h3>
-                </div>
-                <p style="margin: 0; color: #666; font-size: 14px;">Personaliza tu tienda y preferencias</p>
-            </a>
-            
-            <a href="/tickets.php" style="background: white; padding: 30px; border-radius: 12px; text-decoration: none; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid #17a2b8;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                        <i class="fas fa-ticket-alt" style="font-size: 24px; color: white;"></i>
-                    </div>
-                    <h3 style="margin: 0; font-size: 20px;">Soporte</h3>
-                </div>
-                <p style="margin: 0; color: #666; font-size: 14px;">Contacta con el equipo de soporte</p>
-            </a>
-            
-        </div>
-        
-        <!-- Estadísticas rápidas -->
-        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
-            <h2 style="margin: 0 0 20px 0; color: #333;"><i class="fas fa-chart-line"></i> Resumen de Actividad</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                
-                <?php
-                // Obtener estadísticas
-                $stats_products = $pdo->prepare("SELECT COUNT(*) as total FROM products WHERE tenant_id = :tid AND deleted_at IS NULL");
-                $stats_products->execute([':tid' => $tenant['id']]);
-                $total_products = $stats_products->fetch()['total'] ?? 0;
-                
-                $stats_orders = $pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE tenant_id = :tid");
-                $stats_orders->execute([':tid' => $tenant['id']]);
-                $total_orders = $stats_orders->fetch()['total'] ?? 0;
-                
-                $stats_revenue = $pdo->prepare("SELECT SUM(total) as revenue FROM orders WHERE tenant_id = :tid AND status = 'paid'");
-                $stats_revenue->execute([':tid' => $tenant['id']]);
-                $total_revenue = $stats_revenue->fetch()['revenue'] ?? 0;
-                ?>
-                
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
-                    <div style="font-size: 36px; font-weight: bold; color: #667eea; margin-bottom: 5px;"><?= $total_products ?></div>
-                    <div style="color: #666; font-size: 14px;">Productos Activos</div>
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
-                    <div style="font-size: 36px; font-weight: bold; color: #28a745; margin-bottom: 5px;"><?= $total_orders ?></div>
-                    <div style="color: #666; font-size: 14px;">Pedidos Totales</div>
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
-                    <div style="font-size: 36px; font-weight: bold; color: #ffc107; margin-bottom: 5px;">$<?= number_format($total_revenue, 2) ?></div>
-                    <div style="color: #666; font-size: 14px;">Ingresos Totales</div>
-                </div>
-                
-            </div>
-        </div>
-        
-    <?php else: ?>
-        
-        <!-- Usuario sin tienda -->
-        <div style="background: white; padding: 50px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
-            <div style="font-size: 64px; color: #e0e0e0; margin-bottom: 20px;">
-                <i class="fas fa-store-slash"></i>
-            </div>
-            <h2 style="color: #333; margin-bottom: 15px;">No administras ninguna tienda</h2>
-            <p style="color: #666; margin-bottom: 30px; font-size: 16px;">
-                Para comenzar a vender, necesitas crear tu tienda primero.
-            </p>
-            <a href="/create_store.php" class="btn btn-primary" style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: 600;">
-                <i class="fas fa-plus-circle"></i> Crear Mi Tienda
-            </a>
-        </div>
-        
-    <?php endif; ?>
-    
-</div>
-
 <style>
-    a[href*="/products.php"]:hover,
-    a[href*="/orders.php"]:hover,
-    a[href*="/settings.php"]:hover,
-    a[href*="/tickets.php"]:hover {
+    .dashboard-container {
+        padding: 40px 20px;
+    }
+    
+    .welcome-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    
+    .welcome-banner h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
+    
+    .stat-icon {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+    
+    .stat-value {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 1.1em;
+    }
+    
+    .quick-actions {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .quick-actions h2 {
+        margin-bottom: 20px;
+        color: #2d3748;
+    }
+    
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: #f7fafc;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #2d3748;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    
+    .action-btn:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+        transform: translateX(5px);
+    }
+    
+    .action-btn i {
+        font-size: 1.8em;
     }
 </style>
+
+<div class="dashboard-container">
+    <div class="container">
+        <?php if (isset($_GET['welcome'])): ?>
+            <div class="welcome-banner">
+                <h1>🎉 ¡Bienvenido a MassolaCommerce!</h1>
+                <p style="font-size: 1.2em;">Tu cuenta ha sido creada exitosamente</p>
+            </div>
+        <?php else: ?>
+            <div class="welcome-banner">
+                <h1>Hola, <?= sanitize($user['username']) ?>!</h1>
+                <p style="font-size: 1.2em;">Bienvenido de vuelta a tu panel de control</p>
+            </div>
+        <?php endif; ?>
+        
+        <div class="stats-grid">
+            <?php if (is_superadmin()): ?>
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="stat-icon"><i class="fas fa-store"></i></div>
+                    <div class="stat-value"><?= $stats['tenants'] ?></div>
+                    <div class="stat-label" style="color: rgba(255,255,255,0.9);">Tiendas Activas</div>
+                </div>
+            <?php endif; ?>
+            
+            <div class="stat-card" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+                <div class="stat-icon"><i class="fas fa-box"></i></div>
+                <div class="stat-value"><?= $stats['products'] ?></div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.9);">Productos</div>
+            </div>
+            
+            <div class="stat-card" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white;">
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-value"><?= $stats['orders'] ?></div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.9);">Pedidos</div>
+            </div>
+            
+            <div class="stat-card" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white;">
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-value">$<?= number_format($stats['revenue'], 2) ?></div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.9);">Ingresos</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <h2><i class="fas fa-bolt"></i> Acciones Rápidas</h2>
+            <div class="actions-grid">
+                <?php if (is_superadmin()): ?>
+                    <a href="/admin/tenants.php" class="action-btn">
+                        <i class="fas fa-store"></i>
+                        <span>Gestionar Tiendas</span>
+                    </a>
+                    <a href="/admin/users.php" class="action-btn">
+                        <i class="fas fa-users"></i>
+                        <span>Usuarios</span>
+                    </a>
+                    <a href="/admin/plans.php" class="action-btn">
+                        <i class="fas fa-tags"></i>
+                        <span>Planes</span>
+                    </a>
+                    <a href="/admin/settings.php" class="action-btn">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                <?php else: ?>
+                    <a href="/products.php" class="action-btn">
+                        <i class="fas fa-box"></i>
+                        <span>Mis Productos</span>
+                    </a>
+                    <a href="/orders.php" class="action-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Pedidos</span>
+                    </a>
+                    <a href="/settings.php" class="action-btn">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                    <a href="/reports.php" class="action-btn">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reportes</span>
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include_once __DIR__ . '/footer.php'; ?>

@@ -1,209 +1,253 @@
 <?php
-// register.php - Página de registro en raíz
+// register.php - Registro de usuarios
 require_once __DIR__ . '/includes/init.php';
 
 $error = '';
 $success = '';
 $pageTitle = 'Crear Cuenta - MassolaCommerce';
+$selectedPlan = $_GET['plan'] ?? 'professional';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_verify($_POST['_csrf'] ?? '')) {
-        $error = "Token de seguridad inválido. Por favor intenta de nuevo.";
+        $error = "Token de seguridad inválido.";
     } else {
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
-        $password_confirm = $_POST['password_confirm'] ?? '';
-        $plan = $_POST['plan'] ?? 'basic';
+        $confirm = $_POST['confirm_password'] ?? '';
+        $plan = $_POST['plan'] ?? 'professional';
         
         // Validaciones
         if (!$username || !$email || !$password) {
-            $error = "Por favor completa todos los campos requeridos.";
+            $error = "Completa todos los campos.";
+        } elseif (strlen($username) < 3) {
+            $error = "El usuario debe tener al menos 3 caracteres.";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "Email inválido. Por favor ingresa un email válido.";
-        } elseif (strlen($password) < 8) {
-            $error = "La contraseña debe tener al menos 8 caracteres.";
-        } elseif ($password !== $password_confirm) {
+            $error = "Email inválido.";
+        } elseif (strlen($password) < 6) {
+            $error = "La contraseña debe tener al menos 6 caracteres.";
+        } elseif ($password !== $confirm) {
             $error = "Las contraseñas no coinciden.";
         } else {
-            // Verificar si usuario o email ya existen
-            $s = $pdo->prepare("SELECT id FROM users WHERE username = :u OR email = :e LIMIT 1");
-            $s->execute([':u' => $username, ':e' => $email]);
+            // Verificar si ya existe
+            $check = $pdo->prepare("SELECT id FROM users WHERE username = :u OR email = :e LIMIT 1");
+            $check->execute([':u' => $username, ':e' => $email]);
             
-            if ($s->fetch()) {
-                $error = "El usuario o email ya está registrado. Por favor usa otro.";
+            if ($check->fetch()) {
+                $error = "El usuario o email ya existe.";
             } else {
-                try {
-                    $pdo->beginTransaction();
-                    
-                    // Crear usuario
-                    $hash = password_hash($password, PASSWORD_BCRYPT);
-                    $ins = $pdo->prepare("INSERT INTO users (username, email, password_hash, is_active, created_at) VALUES (:u, :e, :h, 1, NOW())");
-                    $ins->execute([':u' => $username, ':e' => $email, ':h' => $hash]);
-                    $user_id = $pdo->lastInsertId();
-                    
-                    // Asignar rol customer por defecto
-                    $r = $pdo->prepare("SELECT id FROM roles WHERE slug = 'customer' LIMIT 1");
-                    $r->execute();
-                    $role = $r->fetch();
-                    
-                    if ($role) {
-                        $pdo->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (:uid, :rid)")
-                            ->execute([':uid' => $user_id, ':rid' => $role['id']]);
-                    }
-                    
-                    $pdo->commit();
-                    
-                    // Registrar acción
-                    log_user_action('Usuario registrado', ['username' => $username, 'email' => $email]);
-                    
-                    // Enviar email de bienvenida (si está configurado)
-                    if (function_exists('send_welcome_email')) {
-                        send_welcome_email($email, $username);
-                    }
-                    
-                    // Auto-login
-                    session_regenerate_id(true);
-                    $_SESSION['user_id'] = $user_id;
-                    $_SESSION['username'] = $username;
-                    $_SESSION['email'] = $email;
-                    $_SESSION['role'] = 'customer';
-                    
-                    // Redirigir al dashboard
-                    header('Location: /dashboard.php');
-                    exit;
-                    
-                } catch (Exception $e) {
-                    $pdo->rollBack();
-                    $error = "Error al crear la cuenta. Por favor intenta de nuevo.";
-                    log_error("Error en registro: " . $e->getMessage());
+                // Crear usuario
+                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("
+                    INSERT INTO users (username, email, password_hash, is_active, created_at) 
+                    VALUES (:u, :e, :p, 1, NOW())
+                ");
+                $stmt->execute([
+                    ':u' => $username,
+                    ':e' => $email,
+                    ':p' => $hash
+                ]);
+                
+                $userId = $pdo->lastInsertId();
+                
+                // Asignar rol de tenant_admin
+                $roleStmt = $pdo->prepare("SELECT id FROM roles WHERE slug = 'tenant_admin' LIMIT 1");
+                $roleStmt->execute();
+                $role = $roleStmt->fetch();
+                
+                if ($role) {
+                    $pdo->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (:uid, :rid)")
+                        ->execute([':uid' => $userId, ':rid' => $role['id']]);
                 }
+                
+                $success = "¡Cuenta creada! Ahora puedes iniciar sesión.";
+                
+                // Auto-login
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['username'] = $username;
+                $_SESSION['email'] = $email;
+                $_SESSION['role'] = 'tenant_admin';
+                
+                // Redirigir al dashboard
+                header('Location: /dashboard.php?welcome=1');
+                exit;
             }
         }
     }
 }
 
-// Obtener plan desde URL
-$selected_plan = $_GET['plan'] ?? 'professional';
-
 include_once __DIR__ . '/header.php';
 ?>
 
-<div class="container" style="max-width: 600px; margin: 60px auto; padding: 40px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-    <h2 style="text-align: center; margin-bottom: 10px; color: #333;">Crear Cuenta</h2>
-    <p style="text-align: center; color: #666; margin-bottom: 30px;">Únete a MassolaCommerce y comienza tu prueba gratuita</p>
-    
-    <?php if (!empty($error)): ?>
-        <div class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc3545;">
-            <i class="fas fa-exclamation-circle"></i> <?= sanitize($error) ?>
-        </div>
-    <?php endif; ?>
-    
-    <?php if (!empty($success)): ?>
-        <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
-            <i class="fas fa-check-circle"></i> <?= sanitize($success) ?>
-        </div>
-    <?php endif; ?>
-    
-    <form method="post" action="/register.php" style="display: flex; flex-direction: column; gap: 20px;">
-        <?= csrf_field() ?>
-        <input type="hidden" name="plan" value="<?= sanitize($selected_plan) ?>">
-        
-        <div class="form-group">
-            <label for="username" style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                <i class="fas fa-user"></i> Usuario <span style="color: #dc3545;">*</span>
-            </label>
-            <input type="text" 
-                   id="username"
-                   name="username" 
-                   placeholder="Elige un nombre de usuario" 
-                   required 
-                   autofocus
-                   minlength="3"
-                   maxlength="50"
-                   value="<?= isset($_POST['username']) ? sanitize($_POST['username']) : '' ?>"
-                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
-            <small style="color: #666; font-size: 13px;">Mínimo 3 caracteres, solo letras, números y guiones bajos</small>
-        </div>
-        
-        <div class="form-group">
-            <label for="email" style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                <i class="fas fa-envelope"></i> Email <span style="color: #dc3545;">*</span>
-            </label>
-            <input type="email" 
-                   id="email"
-                   name="email" 
-                   placeholder="tu@email.com" 
-                   required
-                   value="<?= isset($_POST['email']) ? sanitize($_POST['email']) : '' ?>"
-                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
-        </div>
-        
-        <div class="form-group">
-            <label for="password" style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                <i class="fas fa-lock"></i> Contraseña <span style="color: #dc3545;">*</span>
-            </label>
-            <input type="password" 
-                   id="password"
-                   name="password" 
-                   placeholder="Mínimo 8 caracteres" 
-                   required
-                   minlength="8"
-                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
-            <small style="color: #666; font-size: 13px;">Mínimo 8 caracteres. Usa letras, números y símbolos para mayor seguridad</small>
-        </div>
-        
-        <div class="form-group">
-            <label for="password_confirm" style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">
-                <i class="fas fa-lock"></i> Confirmar Contraseña <span style="color: #dc3545;">*</span>
-            </label>
-            <input type="password" 
-                   id="password_confirm"
-                   name="password_confirm" 
-                   placeholder="Repite tu contraseña" 
-                   required
-                   minlength="8"
-                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
-        </div>
-        
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
-            <p style="margin: 0; font-size: 14px; color: #555;">
-                <i class="fas fa-info-circle" style="color: #667eea;"></i>
-                Al crear tu cuenta, aceptas nuestros 
-                <a href="/legal/terms.php" style="color: #667eea;">Términos de Servicio</a> y 
-                <a href="/legal/privacy.php" style="color: #667eea;">Política de Privacidad</a>
-            </p>
-        </div>
-        
-        <button type="submit" 
-                class="btn btn-primary" 
-                style="width: 100%; padding: 15px; font-size: 18px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s;">
-            <i class="fas fa-user-plus"></i> Crear Mi Cuenta
-        </button>
-    </form>
-    
-    <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-        <p style="color: #666; margin-bottom: 10px;">¿Ya tienes cuenta?</p>
-        <a href="/login.php" class="btn btn-outline" style="display: inline-block; padding: 10px 30px; border: 2px solid #667eea; color: #667eea; text-decoration: none; border-radius: 8px; transition: all 0.3s;">
-            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-        </a>
-    </div>
-</div>
-
 <style>
-    .form-group input:focus {
+    .register-container {
+        max-width: 550px;
+        margin: 60px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .register-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2d3748;
+        font-size: 2em;
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .alert-danger {
+        background: #fed7d7;
+        color: #c53030;
+        border-left: 4px solid #f56565;
+    }
+    
+    .alert-success {
+        background: #c6f6d5;
+        color: #22543d;
+        border-left: 4px solid #48bb78;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #4a5568;
+    }
+    
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
         outline: none;
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    
+    .register-footer {
+        margin-top: 30px;
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
     }
-    .btn-outline:hover {
-        background: #667eea;
-        color: white;
+    
+    .register-footer p {
+        color: #718096;
+        margin-bottom: 15px;
     }
 </style>
+
+<div class="register-container">
+    <h2 class="register-title">Crear Cuenta</h2>
+    
+    <?php if ($error): ?>
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> <?= sanitize($error) ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if ($success): ?>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <?= sanitize($success) ?>
+        </div>
+    <?php endif; ?>
+    
+    <form method="post" action="/register.php">
+        <?= csrf_field() ?>
+        
+        <div class="form-group">
+            <label for="username">
+                <i class="fas fa-user"></i> Usuario
+            </label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                placeholder="Elige un nombre de usuario"
+                required 
+                autofocus
+                value="<?= isset($_POST['username']) ? sanitize($_POST['username']) : '' ?>"
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="email">
+                <i class="fas fa-envelope"></i> Email
+            </label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="tu@email.com"
+                required
+                value="<?= isset($_POST['email']) ? sanitize($_POST['email']) : '' ?>"
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="password">
+                <i class="fas fa-lock"></i> Contraseña
+            </label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="Mínimo 6 caracteres"
+                required
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="confirm_password">
+                <i class="fas fa-lock"></i> Confirmar Contraseña
+            </label>
+            <input 
+                type="password" 
+                id="confirm_password" 
+                name="confirm_password" 
+                placeholder="Repite tu contraseña"
+                required
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="plan">
+                <i class="fas fa-star"></i> Plan
+            </label>
+            <select id="plan" name="plan">
+                <option value="basic" <?= $selectedPlan === 'basic' ? 'selected' : '' ?>>Básico - $550/mes</option>
+                <option value="professional" <?= $selectedPlan === 'professional' ? 'selected' : '' ?>>Profesional - $750/mes</option>
+                <option value="enterprise" <?= $selectedPlan === 'enterprise' ? 'selected' : '' ?>>Empresa - $1500/mes</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px;">
+            <i class="fas fa-rocket"></i> Crear Cuenta
+        </button>
+    </form>
+    
+    <div class="register-footer">
+        <p>¿Ya tienes cuenta?</p>
+        <a href="/login.php" class="btn btn-outline">
+            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </a>
+    </div>
+</div>
 
 <?php include_once __DIR__ . '/footer.php'; ?>
